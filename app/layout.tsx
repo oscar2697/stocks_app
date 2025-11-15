@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 // @ts-ignore: CSS module declaration missing — add "declare module '*.css';" in a .d.ts file to remove this
-import './globals.css';
+import './globals.css'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
