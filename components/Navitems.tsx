@@ -1,6 +1,6 @@
 'use client'
 
-import { NavItems } from '@/lib/constants'
+import { NAV_ITEMS } from '@/lib/constants'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -15,7 +15,7 @@ const Navitems = () => {
 
     return (
         <ul className='flex flex-col sm:flex-row p-2 gap-3 sm:gap-10 font-medium'>
-            {NavItems.map(({ href, label }) => (
+            {NAV_ITEMS.map(({ href, label }) => (
                 <li key={href}>
                     <Link
                         href={href}
