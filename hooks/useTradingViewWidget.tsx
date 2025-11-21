@@ -11,7 +11,7 @@ const useTradingViewWidget = (scriptUrl: string, config: Record<string, unknown>
 
         containerRef.current.innerHTML = `<div class="tradingview-widget-container__widget" style=" width: 100%; height: ${height}px;"></div>`
 
-        const script = document.createElement("script");
+        const script = document.createElement("script")
         script.src = scriptUrl
         script.async = true
         script.innerHTML = JSON.stringify(config)
