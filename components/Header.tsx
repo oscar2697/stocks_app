@@ -3,12 +3,12 @@ import Link from 'next/link'
 import Navitems from './Navitems'
 import UserDropDown from './UserDropDown'
 
-const Header = () => {
+const Header = ({ user }: { user: User }) => {
     return (
         <header className='sticky top-0 header'>
             <div className='container header-wrapper'>
                 <Link href='/'>
-                    <Image 
+                    <Image
                         src='/assets/icons/logo.svg'
                         alt='Stock logo'
                         width={142}
@@ -21,7 +21,9 @@ const Header = () => {
                     <Navitems />
                 </nav>
 
-                <UserDropDown />
+                <UserDropDown 
+                    user={user}
+                />
             </div>
         </header>
     )

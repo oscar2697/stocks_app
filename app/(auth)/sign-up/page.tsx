@@ -5,10 +5,15 @@ import FooterLink from "@/components/forms/FooterLink"
 import InputField from "@/components/forms/inputField"
 import SelectField from "@/components/forms/SelectField"
 import { Button } from "@/components/ui/button"
+import { signUpWithEmail } from "@/lib/actions/auth.actions"
 import { INVESTMENT_GOALS, PREFERRED_INDUSTRIES, RISK_TOLERANCE_OPTIONS } from "@/lib/constants"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 
 const SignUpPage = () => {
+    const router = useRouter()
+
     const {
         register,
         handleSubmit,
@@ -28,9 +33,14 @@ const SignUpPage = () => {
 
     const onSubmit = async (data: SignUpFormData) => {
         try {
-            console.log('Sign Up', data)
+            const result = await signUpWithEmail(data)
+
+            if(result.success) router.push('/')
         } catch (error) {
             console.error(error)
+            toast.error('An unexpected error ocurred. Please try again,', {
+                description: error instanceof Error ? error.message : 'Failed to sign up. Please try again.'
+            })
         }
     }
 

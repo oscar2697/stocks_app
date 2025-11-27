@@ -13,15 +13,15 @@ import { useRouter } from "next/navigation"
 import { Button } from "./ui/button"
 import { LogOut } from "lucide-react"
 import Navitems from "./Navitems"
+import { signOut } from "@/lib/actions/auth.actions"
 
-const UserDropDown = () => {
+const UserDropDown = ({ user }: { user: User }) => {
     const router = useRouter()
 
     const handleSignOut = async () => {
-        router.push('sign-in')
+        await signOut()
+        router.push('/sign-in')
     }
-
-    const user = { name: 'Oscar', email: 'lindooscar635@gmail.com' }
 
     return (
         <DropdownMenu>
@@ -71,7 +71,7 @@ const UserDropDown = () => {
 
                 <DropdownMenuSeparator className="bg-gray-600" />
 
-                <DropdownMenuItem 
+                <DropdownMenuItem
                     onClick={handleSignOut}
                     className="text-gray-100 text-md font-medium focus:bg-transparent focus:text-yellow-500 transition-colors cursor-pointer"
                 >
@@ -80,7 +80,7 @@ const UserDropDown = () => {
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator className="hidden sm:block bg-gray-600" />
-                
+
                 <nav className="sm:hidden">
                     <Navitems />
                 </nav>
