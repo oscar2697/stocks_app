@@ -4,23 +4,23 @@ const MONGODB_URI = process.env.MONGODB_URI
 
 declare global {
     var mongooseCache: {
-        conn: typeof mongoose |  null
+        conn: typeof mongoose | null
         promise: Promise<typeof mongoose> | null
     }
 }
 
 let cached = global.mongooseCache
 
-if(!cached) {
-    cached = mongooseCache = {conn: null, promise: null}
+if (!cached) {
+    cached = global.mongooseCache = { conn: null, promise: null }
 }
 
 export const connectToDatabase = async () => {
-    if(!MONGODB_URI) throw new Error('MONGODB_URL is not defined in .env file')
-    if(cached.conn) return cached.conn
+    if (!MONGODB_URI) throw new Error('MONGODB_URL is not defined in .env file')
+    if (cached.conn) return cached.conn
 
-    if(!cached.promise) {
-        cached.promise = mongoose.connect(MONGODB_URI, {bufferCommands: false})
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(MONGODB_URI, { bufferCommands: false })
     }
 
     try {
@@ -31,4 +31,6 @@ export const connectToDatabase = async () => {
     }
 
     console.log(`Connected to database ${process.env.NODE_ENV} ${MONGODB_URI}`)
+
+    return cached.conn
 } 
