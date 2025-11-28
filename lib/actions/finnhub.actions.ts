@@ -5,7 +5,7 @@ import { POPULAR_STOCK_SYMBOLS } from '@/lib/constants'
 import { cache } from 'react'
 
 const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1'
-const NEXT_PUBLIC_FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? ''
+const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY
 
 async function fetchJSON<T>(url: string, revalidateSeconds?: number): Promise<T> {
     const options: RequestInit & { next?: { revalidate?: number } } = revalidateSeconds
@@ -25,9 +25,9 @@ export { fetchJSON }
 export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> {
     try {
         const range = getDateRange(5)
-        const token = process.env.FINNHUB_API_KEY ?? NEXT_PUBLIC_FINNHUB_API_KEY
+        const token = FINNHUB_API_KEY
         if (!token) {
-            throw new Error('FINNHUB API key is not configured')
+            throw new Error('FINNHUB_API_KEY is not configured on the server. Set FINNHUB_API_KEY in server environment variables.')
         }
         const cleanSymbols = (symbols || [])
             .map((s) => s?.trim().toUpperCase())
@@ -96,9 +96,9 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
 
 export const searchStocks = cache(async (query?: string): Promise<StockWithWatchlistStatus[]> => {
     try {
-        const token = process.env.FINNHUB_API_KEY ?? NEXT_PUBLIC_FINNHUB_API_KEY
+        const token = FINNHUB_API_KEY
         if (!token) {
-            console.error('Error in stock search:', new Error('FINNHUB API key is not configured'))
+            console.error('Error in stock search: FINNHUB_API_KEY server environment variable is not configured')
             return []
         }
 
