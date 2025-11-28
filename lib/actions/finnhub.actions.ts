@@ -44,6 +44,7 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
                     try {
                         const url = `${FINNHUB_BASE_URL}/company-news?symbol=${encodeURIComponent(sym)}&from=${range.from}&to=${range.to}&token=${token}`
                         const articles = await fetchJSON<RawNewsArticle[]>(url, 300)
+
                         perSymbolArticles[sym] = (articles || []).filter(validateArticle)
                     } catch (e) {
                         console.error('Error fetching company news for', sym, e)
@@ -58,10 +59,13 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
                 for (let i = 0; i < cleanSymbols.length; i++) {
                     const sym = cleanSymbols[i]
                     const list = perSymbolArticles[sym] || []
+
                     if (list.length === 0) continue
                     const article = list.shift()
+
                     if (!article || !validateArticle(article)) continue
                     collected.push(formatArticle(article, true, sym, round))
+
                     if (collected.length >= maxArticles) break
                 }
                 if (collected.length >= maxArticles) break
@@ -84,7 +88,7 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
             if (seen.has(key)) continue
             seen.add(key)
             unique.push(art)
-            if (unique.length >= 20) break 
+            if (unique.length >= 20) break
         }
 
         const formatted = unique.slice(0, maxArticles).map((a, idx) => formatArticle(a, false, undefined, idx))
@@ -109,6 +113,7 @@ export const searchStocks = cache(async (query?: string): Promise<StockWithWatch
 
         if (!trimmed) {
             const top = POPULAR_STOCK_SYMBOLS.slice(0, 10)
+
             const profiles = await Promise.all(
                 top.map(async (sym) => {
                     try {
@@ -127,7 +132,9 @@ export const searchStocks = cache(async (query?: string): Promise<StockWithWatch
                     const symbol = sym.toUpperCase()
                     const name: string | undefined = profile?.name || profile?.ticker || undefined
                     const exchange: string | undefined = profile?.exchange || undefined
+
                     if (!name) return undefined
+
                     const r: FinnhubSearchResult = {
                         symbol,
                         description: name,
@@ -135,7 +142,7 @@ export const searchStocks = cache(async (query?: string): Promise<StockWithWatch
                         type: 'Common Stock',
                     };
 
-                    (r as any).__exchange = exchange 
+                    (r as any).__exchange = exchange
                     return r
                 })
                 .filter((x): x is FinnhubSearchResult => Boolean(x))
@@ -153,6 +160,7 @@ export const searchStocks = cache(async (query?: string): Promise<StockWithWatch
                 const exchangeFromProfile = (r as any).__exchange as string | undefined
                 const exchange = exchangeFromDisplay || exchangeFromProfile || 'US'
                 const type = r.type || 'Stock'
+
                 const item: StockWithWatchlistStatus = {
                     symbol: upper,
                     name,
