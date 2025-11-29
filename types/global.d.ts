@@ -108,6 +108,7 @@ declare global {
         isInWatchlist: boolean
         showTrashIcon?: boolean
         type?: 'button' | 'icon'
+        userEmail?: string
         onWatchlistChange?: (symbol: string, isAdded: boolean) => void
     }
 
@@ -162,6 +163,12 @@ declare global {
         category: string
         related: string
         image?: string
+    }
+
+    type UserForNewsEmail = {
+        id: string
+        email: string
+        name: string
     }
 
     type WatchlistNewsProps = {
