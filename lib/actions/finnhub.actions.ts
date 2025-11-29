@@ -5,7 +5,7 @@ import { POPULAR_STOCK_SYMBOLS } from '@/lib/constants'
 import { cache } from 'react'
 
 const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1'
-const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? ''
+const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY ?? process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? ''
 
 async function fetchJSON<T>(url: string, revalidateSeconds?: number): Promise<T> {
     const options: RequestInit & { next?: { revalidate?: number } } = revalidateSeconds
@@ -21,6 +21,79 @@ async function fetchJSON<T>(url: string, revalidateSeconds?: number): Promise<T>
 }
 
 export { fetchJSON }
+
+export async function getQuote(symbol: string): Promise<{ price: number; change: number; changePercent: number }> {
+    try {
+        const token = FINNHUB_API_KEY
+        if (!token) {
+            throw new Error('FINNHUB_API_KEY is not configured on the server')
+        }
+
+        const url = `${FINNHUB_BASE_URL}/quote?symbol=${encodeURIComponent(symbol.toUpperCase())}&token=${token}`
+        const data = await fetchJSON<{
+            c?: number
+            d?: number
+            dp?: number
+        }>(url, 60)
+
+        return {
+            price: data?.c ?? 0,
+            change: data?.d ?? 0,
+            changePercent: data?.dp ?? 0,
+        }
+    } catch (err) {
+        console.error('Error fetching quote for', symbol, err)
+        return { price: 0, change: 0, changePercent: 0 }
+    }
+}
+
+export async function getCompanyProfile(symbol: string): Promise<{ name: string; marketCap: number; peRatio?: number }> {
+    try {
+        const token = FINNHUB_API_KEY
+        if (!token) {
+            throw new Error('FINNHUB_API_KEY is not configured on the server')
+        }
+
+        const url = `${FINNHUB_BASE_URL}/stock/profile2?symbol=${encodeURIComponent(symbol.toUpperCase())}&token=${token}`
+        const data = await fetchJSON<{
+            name?: string
+            marketCapitalization?: number
+            peRatio?: number
+        }>(url, 3600)
+
+        return {
+            name: data?.name || symbol.toUpperCase(),
+            marketCap: data?.marketCapitalization ?? 0,
+            peRatio: data?.peRatio,
+        }
+    } catch (err) {
+        console.error('Error fetching company profile for', symbol, err)
+        return { name: symbol.toUpperCase(), marketCap: 0 }
+    }
+}
+
+export async function getMetrics(symbol: string): Promise<{ peRatio: number }> {
+    try {
+        const token = FINNHUB_API_KEY
+        if (!token) {
+            throw new Error('FINNHUB_API_KEY is not configured on the server')
+        }
+
+        const url = `${FINNHUB_BASE_URL}/stock/metric?symbol=${encodeURIComponent(symbol.toUpperCase())}&metric=all&token=${token}`
+        const data = await fetchJSON<{
+            metric?: {
+                'peForward'?: number
+                'peRatio'?: number
+            }
+        }>(url, 3600)
+
+        const peRatio = data?.metric?.['peRatio'] ?? data?.metric?.['peForward'] ?? 0
+        return { peRatio }
+    } catch (err) {
+        console.error('Error fetching metrics for', symbol, err)
+        return { peRatio: 0 }
+    }
+}
 
 export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> {
     try {
